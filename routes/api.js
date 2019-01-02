@@ -83,24 +83,30 @@ router.post('/login',(req,res)=>{
     var password=common.md5(req.body.password+common.MD5_SUFFIX);
     db.query(`SELECT * FROM UserTable WHERE tel='${tel}'`,(err,data)=>{
         if(err){
-            console.error(err);
             res.status(500).send('database error').end();
         }else{               
             if(data.length==0){
-                res.status(400).send('用户不存在,请注册！').end();
+                res.json({code:1,msg:'用户不存在,请注册！'}).end();
             }else{                    
                 if(data[0].password==password){
                     req.session['admin_id']=data[0].ID
-                    res.json(data);
+                    res.json({code:0,msg:'登录成功！'}).end();
                 }else{
-                    res.status(400).send('密码错误！').end();
+                    res.json({code:2,msg:'密码错误！'}).end();
                 }
             }
         }
     })
     
 });
-
+// 检查登录状态
+    router.use((req,res,next)=>{
+        if(!req.session['admin_id']){
+            res.json({code:0,msg:'重新登录'}).end();
+        }else{
+            next();
+        }
+    });
 router.post('/register',(req,res)=>{
     var tel=req.body.tel;
     var password=common.md5(req.body.password+common.MD5_SUFFIX);
@@ -116,11 +122,11 @@ router.post('/register',(req,res)=>{
                         console.error(err);
                         res.status(500).send('database error').end();
                     }else{               
-                        res.status(200).send('注册成功!')
+                        res.json({code:0,msg:'注册成功！'}).end();
                     }
                 })
             }else{
-                res.send('用户已存在！')
+                res.json({code:1,msg:'用户已存在！'}).end();
             }
         }
     })
