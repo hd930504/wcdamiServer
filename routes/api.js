@@ -39,7 +39,7 @@ router.get("/gt/register", function (req, res) {
 
             // 1. 继续使用极验提供的failback备用方案
             req.session.fallback = true;
-            res.send(data);
+            res.josn(data);
 
             // 2. 使用自己提供的备用方案
             // todo
@@ -47,7 +47,7 @@ router.get("/gt/register", function (req, res) {
         } else {
             // 正常模式
             req.session.fallback = false;
-            res.send(data);
+            res.json(data);
         }
     });
 });
@@ -133,4 +133,15 @@ router.post('/register',(req,res)=>{
     
     
 });
+
+router.get('/banner',(req,res)=>{
+    db.query(`SELECT * FROM bannertable`,(err,data)=>{
+        if(err){
+            console.error(err);
+            res.status(500).send('database error').end();
+        }else{
+            res.json(data).end();
+        }
+    })
+})
 module.exports = router;

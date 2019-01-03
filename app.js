@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var mysql = require('mysql');
 var logger = require('morgan');
+var consolidate = require('consolidate');
+
 
 var indexRouter = require('./routes/index');
 var api = require('./routes/api');
@@ -32,9 +34,14 @@ app.use(bodyParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/', indexRouter);
 app.use('/api', api);
 
+app.engine('html', consolidate.ejs);
+app.set('views', 'dist');
+app.set('view engine', 'html');
+
+app.use(express.static(path.join(__dirname, 'dist')));
 module.exports = app;
