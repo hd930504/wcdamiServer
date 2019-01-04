@@ -140,6 +140,7 @@ router.get('/banner',(req,res)=>{
             console.error(err);
             res.status(500).send('database error').end();
         }else{
+            console.log(data)
             res.json(data).end();
         }
     })
