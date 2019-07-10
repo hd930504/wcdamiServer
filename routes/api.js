@@ -1,9 +1,12 @@
 var express = require('express');
+var fs = require('fs');
 var common = require('../lib/common');
 var cookieSession = require('cookie-session');
 var mysql=require('mysql');
 var router = express.Router();
 var Geetest = require('gt3-sdk');
+var path = require('path');
+var formidable = require('formidable');
 
 var app = express();
 var db=mysql.createPool({host: 'localhost', user: 'root', password: 'hd564964', database: 'test'});
@@ -19,7 +22,35 @@ app.use(cookieSession({
     resave: false,
     saveUninitialized: true
 }));
+router.get('/banner',(req,res)=>{
+    db.query(`SELECT * FROM bannertable`,(err,data)=>{
+        if(err){
+            console.error(err);
+            res.status(500).send('database error').end();
+        }else{
+            for(let i in data){
+                data[i].src = data[i].src;
+            }
+            res.json(data).end();
+        }
+    })
+})
+router.post('/uploadBanner',(req,res)=>{
+    var form = new formidable.IncomingForm();
+    form.parse(req,(err,fields,files)=>{
+        if(err){res.send(err)}
+        console.log(files.File.type)
+        // let imgPath = files.path
+        // let imgName = './test.' + files.type.split('/')[1];
+        // let data = fs.readFileSync(imgPath);
 
+        // fs.writeFile(imgName,data,function(err){
+        //     if(err){return console.log(err)}
+
+        //     res.json({code:1})
+        // })
+    })
+})
 router.get("/gt/register", function (req, res) {
     // 向极验申请每次验证所需的challenge
     captcha.register({
@@ -134,15 +165,5 @@ router.post('/register',(req,res)=>{
     
 });
 
-router.get('/banner',(req,res)=>{
-    db.query(`SELECT * FROM bannertable`,(err,data)=>{
-        if(err){
-            console.error(err);
-            res.status(500).send('database error').end();
-        }else{
-            console.log(data)
-            res.json(data).end();
-        }
-    })
-})
+
 module.exports = router;
